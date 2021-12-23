@@ -1,10 +1,7 @@
 import machine
 import ustruct
 
-class Midi:
-    uart = 0
-    onboardLED = 0
-    
+class Midi:   
     def __init__(self, uartChannel):
         self.uart = machine.UART(uartChannel, 31250)
         self.onboardLED = machine.Pin(25, machine.Pin.OUT)

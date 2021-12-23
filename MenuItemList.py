@@ -1,11 +1,15 @@
 from math import ceil, floor
 
+from displayWriter import DisplayWriter
+
+
 class MenuItemList:
-    def __init__(self, pageSize):
+    def __init__(self, pageSize: int, dw: DisplayWriter):
         self.pageSize = pageSize
         self.__selectedIndex = -1
         self.pageIndex = 0
         self.__items = []
+        self.__displayWriter = dw
 
     def add(self, item):
         self.__items.append(item)
@@ -47,3 +51,22 @@ class MenuItemList:
                 x["visible"] = True
             else:
                 x["visible"] = False,
+
+    def ShowMenuWithUp(self):
+        self.__displayWriter.Clear()
+        self.__displayWriter.SetText("...", 0, False)
+        for x in range(0, len(self.Items)):
+            s = self.Items[x]
+            if s["visible"] == True:
+                self.__displayWriter.SetText(
+                    s["name"], s["screen"] + 1, s["selected"])
+        self.__displayWriter.Show()
+
+    def ShowMenu(self):
+        self.__displayWriter.Clear()
+        for x in range(0, len(self.Items)):
+            s = self.Items[x]
+            if s["visible"] == True:
+                self.__displayWriter.SetText(
+                    s["name"], s["screen"], s["selected"])
+        self.__displayWriter.Show()

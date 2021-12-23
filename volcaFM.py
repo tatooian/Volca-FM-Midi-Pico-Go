@@ -1,13 +1,11 @@
-import json
 import utime
-import uos
 import machine
 from midi import Midi
 from freeResources import FreeResources
-from folderMenu import FolderMenu
 from fileManager import FileManager
 from displayWriter import DisplayWriter
 from MenuItemList import MenuItemList
+from rotary_irq_rp2 import RotaryIRQ
 
 res = FreeResources()
 print(res.memoryStats())
@@ -28,20 +26,58 @@ print("\n")
 # blob_data = fileMan.GetByteArrayFromFile("Apr2001.SYX")
 # print(res.memoryStats())
 
-# volcaFM = Midi(1)
+volcaFM = Midi(1)
 # volcaFM.sendSysex(blob_data)
 print(res.memoryStats())
 
+
+button = machine.Pin(7, machine.Pin.IN, machine.Pin.PULL_UP)
+
+def button_handler(pin):
+#     global pressed
+    d = debounce(pin)
+    if d == None:
+        return
+    elif not d:
+        print(pin)
+
+#     if not pressed:
+#         pressed= True
+#         print(pin)
+
+def debounce(pin):
+    prev = None
+    for _ in range(128):
+        current_value = pin.value()
+        if prev != None and prev != current_value:
+            return None
+        prev = current_value
+    return prev
+
+button.irq(trigger=machine.Pin.IRQ_FALLING  , handler = button_handler)
+
+r = RotaryIRQ(pin_num_clk=15,
+              pin_num_dt=14,
+              min_val=0,
+              max_val=15,
+              pull_up=True,
+              reverse=True,
+              range_mode=RotaryIRQ.RANGE_BOUNDED)
+
+val_old = r.value()
+
+while True:
+    val_new = r.value()
+
+    if val_old != val_new:
+        val_old = val_new
+        print('result =', val_new)
+    utime.sleep_ms(50)
+
+
+
 folderScreen = DisplayWriter(sdaPIN, sclPIN, 0x3c)
-# folderScreen.ShowMenu()
-fileScreen = DisplayWriter(sdaPIN, sclPIN, 0x3d)
-# fileScreen.ShowMenu()
-
-# folMenu = FolderMenu(fileMan, folderScreen)
-#
-# folMenu.SelectedIndex = 0
-
-folderMenuList = MenuItemList(4)
+folderMenuList = MenuItemList(4, folderScreen)
 for x in range(0, len(folders)):
     mn = {
         "name": folders[x],
@@ -51,44 +87,40 @@ for x in range(0, len(folders)):
         "screen": -1,
         "visible": False,
     }
-    #mn = MenuItem(folders[x], x)
     folderMenuList.add(mn)
-
-# folderMenuList.SelectedIndex = 12
-# #folderMenuList.PageIndex = 1
-# # folderScreen.ChangeIndex(1)
-# folderScreen.Clear()
-# for x in range(0, len(folders)):
-#     s = folderMenuList.Items[x]
-#     if s["visible"] == True:
-#         folderScreen.SetText(s["name"], s["screen"] + 1, s["selected"])
-
-# folderScreen.Show()
 
 for xxx in range(0, 31):
     folderMenuList.SelectedIndex = xxx
-    folderScreen.Clear()
-    for x in range(0, len(folders)):
-        s = folderMenuList.Items[x]
-        if s["visible"] == True:
-            folderScreen.SetText(s["name"], s["screen"] + 1, s["selected"])
-    folderScreen.Show()
-    utime.sleep(1)
+    folderMenuList.ShowMenuWithUp()
+    utime.sleep(.2)
 
-# js = json.dumps(folderMenuList.Items[0])
-# print(js)
-# js = json.dumps(folderMenuList.Items[1])
-# print(js)
-# js = json.dumps(folderMenuList.Items[2])
-# print(js)
-# js = json.dumps(folderMenuList.Items[3])
-# print(js)
-# js = json.dumps(folderMenuList.Items[4])
-# print(js)
-# js = json.dumps(folderMenuList.Items[5])
-# print(js)
+#file screen
+fileScreen = DisplayWriter(sdaPIN, sclPIN, 0x3d)
+fileMenuList = MenuItemList(5, fileScreen)
+fileMan.ChangeFolder(folders[0])
+files = fileMan.FileList()
+print(res.memoryStats())
+print(files)
+print(len(files))
+for x in range(0, len(files)):
+    mn = {
+        "name": files[x],
+        "index": x,
+        "selected": False,
+        "page": -1,
+        "screen": -1,
+        "visible": False,
+    }
+    fileMenuList.add(mn)
 
-# print(res.memoryStats())
+for xxx in range(0, len(files)):
+    fileMenuList.SelectedIndex = xxx
+    fileMenuList.ShowMenu()
+    utime.sleep(.2)
+
+
+
+print(res.memoryStats())
 fileMan.Unmount()
 #import ustruct
 #pin = machine.Pin(25, machine.Pin.OUT)
@@ -161,22 +193,3 @@ fileMan.Unmount()
 # button.irq(trigger=machine.Pin.IRQ_RISING | machine.Pin.IRQ_FALLING , handler = button_handler)
 
 
-# from rotary_irq_rp2 import RotaryIRQ
-
-# r = RotaryIRQ(pin_num_clk=15,
-#               pin_num_dt=14,
-#               min_val=0,
-#               max_val=15,
-#               pull_up=True,
-#               reverse=True,
-#               range_mode=RotaryIRQ.RANGE_BOUNDED)
-
-# val_old = r.value()
-
-# while True:
-#     val_new = r.value()
-
-#     if val_old != val_new:
-#         val_old = val_new
-#         print('result =', val_new)
-#     utime.sleep_ms(50)
