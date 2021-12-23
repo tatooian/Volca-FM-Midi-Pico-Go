@@ -1,0 +1,45 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Python: Current File",
+            "type": "python",
+            "request": "launch",
+            "program": "${file}",
+            "console": "integratedTerminal"
+        },
+        {
+            "name": "Python: ssd1306",
+            "type": "python",
+            "request": "launch",
+            "module": "ssd1306"
+        },
+        {
+            "name": "Python: displayWriter",
+            "type": "python",
+            "request": "launch",
+            "module": "displayWriter"
+        },
+        {
+            "name": "Python: fileManager",
+            "type": "python",
+            "request": "launch",
+            "module": "fileManager"
+        },
+        {
+            "name": "Python: sdcard",
+            "type": "python",
+            "request": "launch",
+            "module": "sdcard"
+        },
+        {
+            "name": "Python: freeResources",
+            "type": "python",
+            "request": "launch",
+            "module": "freeResources"
+        }
+    ]
+}
