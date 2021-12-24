@@ -9,30 +9,24 @@ def OnFolderSelect(folderIndex: int, sender: MenuEncoder, fileMan: FileManager, 
     newFolderName = folderMenuList.Items[folderIndex].name
     fileMan.ChangeFolder(newFolderName)
 
-    print("folder selected: " + newFolderName)
+    #print("folder selected: " + newFolderName)
 
     folders = fileMan.FolderList()
-    print("folder contents: " )
-    print(folders)
-    if len(folders) == 0:
-        fileMan.ParentFolder()
+    #print("folder contents: " )
+    #print(folders)
+    if len(folders) > 0:
+        #print("folderMenuList.SelectedIndex: " + str(folderMenuList.SelectedIndex))
         folderMenuList.Clear()
-        print("folderMenuList.SelectedIndex: " +
-              str(folderMenuList.SelectedIndex))
-        return
-
-    folderMenuList.Clear()
-
-    print("menu item count: " + str(len(folderMenuList.Items)))
-    cnt = len(folderMenuList.Items)
-    sender.UpdateEncoder(cnt-1)
-    folderMenuList.SelectedIndex = 0
-    sender.Reset()
-    folderMenuList.ShowMenu()
+        #print("menu item count: " + str(len(folderMenuList.Items)))
+        cnt = len(folderMenuList.Items)
+        sender.UpdateEncoder(cnt-1)
+        folderMenuList.SelectedIndex = 0
+        sender.Reset()
+        folderMenuList.ShowMenu()
 
 def OnMenuIndexChange(sender: MenuEncoder, folderMenuList: MenuItemList):
     value = sender.Value()
-    print("OnMenuIndexChange:" + str(value))
+    #print("OnMenuIndexChange:" + str(value))
     if value != folderMenuList.SelectedIndex:
         folderMenuList.SelectedIndex = value
         folderMenuList.ShowMenu()

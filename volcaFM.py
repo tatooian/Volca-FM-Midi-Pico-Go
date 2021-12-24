@@ -1,6 +1,7 @@
 from MenuItem import MenuItem
 from MenuItemList import MenuItemList
 from displayWriter import DisplayWriter
+from fileEncoder import FileEncoder
 from fileManager import FileManager
 from freeResources import FreeResources
 from midi import Midi
@@ -31,10 +32,14 @@ folderScreen = DisplayWriter(sdaPIN, sclPIN, 0x3c)
 folderMenuList = MenuItemList(5, folderScreen, fileMan, True)
 folderMenuList.ShowMenu()
 
+# file screen
+fileScreen = DisplayWriter(sdaPIN, sclPIN, 0x3d)
+fileMenuList = MenuItemList(5, fileScreen, fileMan, False)
 
 def onFolderSelect(sender: MenuEncoder):
     OnFolderSelect(sender.Value(), sender, fileMan, folderMenuList)
-
+    fileMenuList.Clear()
+    fileMenuList.ShowMenu()
 
 def onFolderChange(sender: MenuEncoder):
     OnMenuIndexChange(sender, folderMenuList)
@@ -42,7 +47,8 @@ def onFolderChange(sender: MenuEncoder):
 
 def onBackClick(sender: MenuEncoder):
     OnBackbuttonClick(sender, folderMenuList, fileMan)
-
+    fileMenuList.Clear()
+    fileMenuList.ShowMenu()
 
 folderEncoder = MenuEncoder(15, 14, 7)
 cnt = len(folderMenuList.Items)
@@ -52,9 +58,12 @@ folderEncoder.on("value_change", onFolderChange)
 folderEncoder.on("back", onBackClick)
 
 
-# file screen
-fileScreen = DisplayWriter(sdaPIN, sclPIN, 0x3d)
-fileMenuList = MenuItemList(5, fileScreen, fileMan, False)
+def onFileChange(sender: FileEncoder):
+    print(sender.Value())
+
+
+fileEncoder = FileEncoder(12, 2, 8)
+fileEncoder.on("value_change", onFileChange)
 
 
 print(res.memoryStats())

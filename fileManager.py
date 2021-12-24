@@ -61,7 +61,7 @@ class FileManager:
         for x in mylist:
             if x[1] == 0x8000:
                 files.append(x[0])
-
+        print("got files from folder: " + self.CurrentFolder())
         return files
 
     def GetByteArrayFromFile(self, fileName):

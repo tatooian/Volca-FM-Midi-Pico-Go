@@ -28,15 +28,15 @@ class MenuItemList:
         if len(self.__items) == 0:
             sdItems: List[str]
             if self.isFolder == True:
+                print("got folders")
                 sdItems = self.fileMan.FolderList()
             else:
                 sdItems = self.fileMan.FileList()
+                print("got files: " + str(len(sdItems)))
 
-            print("got items")
             for x in range(0, len(sdItems)):
                 mn = MenuItem(sdItems[x], x)
                 self.__add(mn)
-
 
         self.__configItems()
         return self.__items
@@ -83,8 +83,8 @@ class MenuItemList:
                 self.__displayWriter.SetText(
                     s.name, s.screen, s.selected)
 
-            y = json.dumps(s.__dict__)
-            print(y)
+            # y = json.dumps(s.__dict__)
+            # print(y)
 
         self.__displayWriter.Show()
 
