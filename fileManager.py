@@ -15,6 +15,9 @@ class FileManager:
             strPath = strPath + "/" + x
         return strPath
 
+    def CurrentFolderName(self):
+        return self.path[len(self.path)-1]
+
     def CurrentFolder(self):
         return uos.getcwd()
 
@@ -24,8 +27,9 @@ class FileManager:
         uos.chdir(self.__pathToString())
 
     def ParentFolder(self):
-        self.path.pop()
-        uos.chdir(self.__pathToString())
+        if len(self.path) > 2:
+            self.path.pop()
+            uos.chdir(self.__pathToString())
 
     def Mount(self):
         uos.mount(self.sd, "/sd", readonly=True)

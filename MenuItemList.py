@@ -1,21 +1,44 @@
-from math import ceil, floor
-
+from math import floor
+from MenuItem import MenuItem
 from displayWriter import DisplayWriter
-
+from fileManager import FileManager
+from typing import List
+import json
 
 class MenuItemList:
-    def __init__(self, pageSize: int, dw: DisplayWriter):
+    __items: List[MenuItem]
+
+    def __init__(self, pageSize: int, dw: DisplayWriter, fileMan: FileManager, isFolder: bool):
         self.pageSize = pageSize
-        self.__selectedIndex = -1
+        self.__selectedIndex = 0
         self.pageIndex = 0
         self.__items = []
         self.__displayWriter = dw
+        self.fileMan = fileMan
+        self.isFolder = isFolder
 
-    def add(self, item):
+    def __add(self, item: MenuItem):
         self.__items.append(item)
+
+    def Clear(self):
+        self.__items.clear()
 
     @property
     def Items(self):
+        if len(self.__items) == 0:
+            sdItems: List[str]
+            if self.isFolder == True:
+                sdItems = self.fileMan.FolderList()
+            else:
+                sdItems = self.fileMan.FileList()
+
+            print("got items")
+            for x in range(0, len(sdItems)):
+                mn = MenuItem(sdItems[x], x)
+                self.__add(mn)
+
+
+        self.__configItems()
         return self.__items
 
     @property
@@ -39,34 +62,36 @@ class MenuItemList:
 
     def __configItems(self):
         for x in self.__items:
-            x["page"] = floor(x["index"] / self.pageSize)
-            x["screen"] = floor(x["index"] % self.pageSize)
+            if type(x) == MenuItem:
+                x.page = int(floor(x.index / self.pageSize))
+                x.screen = int(floor(x.index % self.pageSize))
+                if x.index == self.SelectedIndex:
+                    x.selected = True
+                else:
+                    x.selected = False
 
-            if x["index"] == self.SelectedIndex:
-                x["selected"] = True
-            else:
-                x["selected"] = False
-
-            if x["page"] == self.PageIndex:
-                x["visible"] = True
-            else:
-                x["visible"] = False,
-
-    def ShowMenuWithUp(self):
-        self.__displayWriter.Clear()
-        self.__displayWriter.SetText("...", 0, False)
-        for x in range(0, len(self.Items)):
-            s = self.Items[x]
-            if s["visible"] == True:
-                self.__displayWriter.SetText(
-                    s["name"], s["screen"] + 1, s["selected"])
-        self.__displayWriter.Show()
+                if x.page == self.PageIndex:
+                    x.visible = True
+                else:
+                    x.visible = False
 
     def ShowMenu(self):
         self.__displayWriter.Clear()
         for x in range(0, len(self.Items)):
             s = self.Items[x]
-            if s["visible"] == True:
+            if s.visible == True:
                 self.__displayWriter.SetText(
-                    s["name"], s["screen"], s["selected"])
+                    s.name, s.screen, s.selected)
+
+            y = json.dumps(s.__dict__)
+            print(y)
+
         self.__displayWriter.Show()
+
+    def SelectByName(self, name:str):
+        for x in range(0, len(self.Items)):
+            s = self.Items[x]
+            if s.name ==name:
+                self.__selectedIndex = x
+                return
+
