@@ -8,6 +8,7 @@
     "python.analysis.extraPaths": [
         ".vscode\\Pico-Stub\\stubs\\machine",
         ".vscode\\Pico-Stub\\stubs\\micropython",
-        ".vscode\\Pico-Stub\\stubs"
+        ".vscode\\Pico-Stub\\stubs",
+        "./lib"
     ]
 }
