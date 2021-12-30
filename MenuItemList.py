@@ -5,6 +5,7 @@ from fileManager import FileManager
 from typing import List
 import json
 
+
 class MenuItemList:
     __items: List[MenuItem]
 
@@ -77,21 +78,28 @@ class MenuItemList:
 
     def ShowMenu(self):
         self.__displayWriter.Clear()
-        for x in range(0, len(self.Items)):
+        print("cleared")
+        cnt = len(self.Items)
+        found = False
+        for x in range(0, cnt):
             s = self.Items[x]
             if s.visible == True:
+                found = True
                 self.__displayWriter.SetText(
                     s.name, s.screen, s.selected)
-
+            if s.visible == False and found == True:
+                break
             # y = json.dumps(s.__dict__)
             # print(y)
 
         self.__displayWriter.Show()
 
-    def SelectByName(self, name:str):
+    def SelectByName(self, name: str):
         for x in range(0, len(self.Items)):
             s = self.Items[x]
-            if s.name ==name:
+            if s.name == name:
                 self.__selectedIndex = x
                 return
 
+    def SelectedName(self):
+        return self.Items[self.__selectedIndex].name

@@ -1,5 +1,6 @@
 from MenuItem import MenuItem
 from MenuItemList import MenuItemList
+from fileEncoder import FileEncoder
 from fileManager import FileManager
 from menuEncoder import MenuEncoder
 from midi import Midi
@@ -32,9 +33,18 @@ def OnMenuIndexChange(sender: MenuEncoder, folderMenuList: MenuItemList):
         folderMenuList.ShowMenu()
     utime.sleep_ms(50)
 
+def OnFileMenuIndexChange(sender: FileEncoder, fileMenuList: MenuItemList):
+    value = sender.Value()
+    #print("OnMenuIndexChange:" + str(value))
+    if value != fileMenuList.SelectedIndex:
+        fileMenuList.SelectedIndex = value
+        fileMenuList.ShowMenu()
+    utime.sleep_ms(50)
+
 
 def OnSysexSelect(fileName: str, fileMan: FileManager, volcaFM:Midi):
     blobData = fileMan.GetByteArrayFromFile(fileName)
+    print(blobData)
     volcaFM.sendSysex(blobData)
 
 

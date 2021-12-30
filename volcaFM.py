@@ -9,16 +9,22 @@ from rotary_irq_rp2 import RotaryIRQ
 import machine
 import utime
 from menuEncoder import MenuEncoder
-from encoderEvents import OnFolderSelect, OnBackbuttonClick, OnMenuIndexChange
+from encoderEvents import OnFileMenuIndexChange, OnFolderSelect, OnBackbuttonClick, OnMenuIndexChange, OnSysexSelect
 
 res = FreeResources()
 print(res.memoryStats())
 
-sdaPIN = machine.Pin(0)
-sclPIN = machine.Pin(1)
-i2c = machine.I2C(0, sda=sdaPIN, scl=sclPIN, freq=400000)
+sdaPINWhite = machine.Pin(0)
+sclPINGreen = machine.Pin(1)
+i2c = machine.I2C(0, sda=sdaPINWhite, scl=sclPINGreen, freq=400000)
 
-fileMan = FileManager(0, 18, 19, 16, 22)
+blueCs = 21
+greenMiso = 20
+yellowMosi = 19
+orangeSck = 18
+
+fileMan = FileManager(0, orangeSck, yellowMosi, greenMiso, blueCs)  # new
+
 fileMan.Mount()
 fileMan.ChangeFolder("sysex")
 folders = fileMan.FolderList()
@@ -28,17 +34,20 @@ volcaFM = Midi(1)
 print(res.memoryStats())
 
 
-folderScreen = DisplayWriter(sdaPIN, sclPIN, 0x3c)
+folderScreen = DisplayWriter(sdaPINWhite, sclPINGreen, 0x3c)
 folderMenuList = MenuItemList(5, folderScreen, fileMan, True)
 folderMenuList.ShowMenu()
 
 # file screen
-fileScreen = DisplayWriter(sdaPIN, sclPIN, 0x3d)
+fileScreen = DisplayWriter(sdaPINWhite, sclPINGreen, 0x3d)
 fileMenuList = MenuItemList(5, fileScreen, fileMan, False)
+
 
 def onFolderSelect(sender: MenuEncoder):
     OnFolderSelect(sender.Value(), sender, fileMan, folderMenuList)
     fileMenuList.Clear()
+    cnt = len(fileMenuList.Items)
+    print(cnt)
     fileMenuList.ShowMenu()
 
 def onFolderChange(sender: MenuEncoder):
@@ -50,7 +59,13 @@ def onBackClick(sender: MenuEncoder):
     fileMenuList.Clear()
     fileMenuList.ShowMenu()
 
-folderEncoder = MenuEncoder(15, 14, 7)
+folderEncGreenButton = 13 #ok
+folderEncOrangeClk =11 #ok
+folderEncYellowData =12 #ok
+folderBackButtonBrown = 26 #ok
+
+folderEncoder = MenuEncoder(
+    folderEncOrangeClk, folderEncYellowData, folderEncGreenButton, folderBackButtonBrown)
 cnt = len(folderMenuList.Items)
 folderEncoder.UpdateEncoder(cnt-1)
 folderEncoder.on("folder_select", onFolderSelect)
@@ -60,11 +75,20 @@ folderEncoder.on("back", onBackClick)
 
 def onFileChange(sender: FileEncoder):
     print(sender.Value())
+    OnFileMenuIndexChange(sender, fileMenuList)
 
+def onFileSelect(sender: FileEncoder):
+    print(fileMenuList.SelectedName())
+    OnSysexSelect(fileMenuList.SelectedName(), fileMan, volcaFM)
 
-fileEncoder = FileEncoder(12, 2, 8)
+fileEncGreenButton = 9 #ok
+fileEncOrangeClk = 8 #ok
+fileEncYellowData = 7 #ok
+fileEncoder = FileEncoder(
+    fileEncOrangeClk, fileEncYellowData, fileEncGreenButton)
+fileEncoder.UpdateEncoder(cnt-1)
 fileEncoder.on("value_change", onFileChange)
-
+fileEncoder.on("file_select", onFileSelect)
 
 print(res.memoryStats())
 # fileMan.Unmount()

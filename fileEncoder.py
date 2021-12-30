@@ -24,9 +24,9 @@ class FileEncoder(ObjectWithEvents):
         self.trigger("back")
 
     def OnValueChange(self):
+        print(self.encoder.value()) 
         self.trigger("value_change")
-        value = self.encoder.value()
-        print(self.encoder.value())
+        value = self.encoder.value()        
 
     # Sets the encoder to use new range
     def UpdateEncoder(self, newUpperLimit):
